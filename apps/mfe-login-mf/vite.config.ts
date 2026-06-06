@@ -2,19 +2,19 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import federation from "@originjs/vite-plugin-federation";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: "web-simple",
-      remotes: {
-        mfeLogin: "http://localhost:5001/assets/remoteEntry.js",
+      name: "mfeLogin", // ⭐ Nome do remote
+      filename: "remoteEntry.js", // ⭐ Arquivo manifesto
+      exposes: {
+        "./LoginApp": "./src/LoginApp", // ⭐ Expor componente
       },
       shared: {
         react: {
-          singleton: true,
-          requiredVersion: "^18.2.0",
+          singleton: true, // ⭐ Uma única instância
+          requiredVersion: "^18.2.0", // ⭐ Versão obrigatória
         },
         "react-dom": {
           singleton: true,
@@ -28,11 +28,17 @@ export default defineConfig({
     }),
   ],
   build: {
+    modulePreload: false, // ⭐ Desabilitar preload
     target: "esnext",
     minify: false,
     cssCodeSplit: false,
   },
   server: {
-    port: 3000,
+    port: 5001,
+    cors: true, // ⭐ Habilitar CORS
+  },
+  preview: {
+    port: 5001,
+    cors: true, // ⭐ Preview na mesma porta
   },
 });
