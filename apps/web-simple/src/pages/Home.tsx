@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { LoadingPage } from '@repo/ui';
-import { useBooks } from '../hooks/useBooks';
-import { BookCard } from '../components/BookCard';
-import { SearchBar } from '../components/SearchBar';
-import { CategoryFilter } from '../components/CategoryFilter';
-import { Header } from '../components/Header';
-import { BookDetailsModal } from '../components/BookDetailsModal';
-import type { Book } from '@repo/types';
+import { useState } from "react";
+import { LoadingPage } from "@repo/ui";
+import { useBooks } from "../hooks/useBooks";
+import { BookCard } from "../components/BookCard";
+import { SearchBar } from "../components/SearchBar";
+import { CategoryFilter } from "../components/CategoryFilter";
+import { Header } from "../components/Header";
+import { BookDetailsModal } from "../components/BookDetailsModal";
+import type { Book } from "@repo/types";
 
 export function Home() {
   const {
@@ -23,17 +23,17 @@ export function Home() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
   const handleLoginClick = () => {
-    console.log('Login clicked - implementar modal de login');
-    // TODO: Abrir modal de login
+    window.history.pushState({}, "", "/login");
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   const handleFavoritesClick = () => {
-    console.log('Favorites clicked - implementar modal de favoritos');
+    console.log("Favorites clicked - implementar modal de favoritos");
     // TODO: Abrir modal de favoritos
   };
 
   const handleProfileClick = () => {
-    console.log('Profile clicked - implementar dropdown de perfil');
+    console.log("Profile clicked - implementar dropdown de perfil");
     // TODO: Abrir dropdown de perfil com opção de logout
   };
 
@@ -53,7 +53,9 @@ export function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Erro ao carregar livros</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Erro ao carregar livros
+          </h2>
           <p className="text-gray-600">{error}</p>
         </div>
       </div>
@@ -92,20 +94,21 @@ export function Home() {
         <div className="mb-6">
           <p className="text-gray-600">
             {books.length === 0 ? (
-              'Nenhum livro encontrado'
+              "Nenhum livro encontrado"
             ) : (
               <>
-                Mostrando <span className="font-semibold">{books.length}</span> livro
-                {books.length !== 1 && 's'}
+                Mostrando <span className="font-semibold">{books.length}</span>{" "}
+                livro
+                {books.length !== 1 && "s"}
                 {selectedCategory && (
                   <>
-                    {' '}
+                    {" "}
                     em <span className="font-semibold">{selectedCategory}</span>
                   </>
                 )}
                 {searchQuery && (
                   <>
-                    {' '}
+                    {" "}
                     para <span className="font-semibold">"{searchQuery}"</span>
                   </>
                 )}
@@ -124,7 +127,11 @@ export function Home() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {books.map((book) => (
-              <BookCard key={book.id} book={book} onBookClick={handleBookClick} />
+              <BookCard
+                key={book.id}
+                book={book}
+                onBookClick={handleBookClick}
+              />
             ))}
           </div>
         )}
