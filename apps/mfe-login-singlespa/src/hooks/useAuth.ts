@@ -1,28 +1,70 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import singleSpaReact from 'single-spa-react';
-import { Provider } from 'react-redux';
-import { LoginApp } from './LoginApp';
-import { getSharedStore } from './store';
-import './styles.css';
+import { useState } from "react";
+import type { LoginCredentials, RegisterData } from "@repo/types";
+import { loginUser, registerUser } from "../services/auth-api";
+import { dispatchAuthSuccess } from "../services/auth-events";
+import { useAppDispatch } from "../store";
+import { authSlice } from "@repo/store";
 
-const lifecycles = singleSpaReact({
-	React,
-	ReactDOM,
-	rootComponent: (props: any) => (
-		<Provider store={getSharedStore()}>
-			<LoginApp {...props} />
-		</Provider>
-	),
-	errorBoundary(err, info, props) {
-		return (
-			<div className='p-4 bg-red-50 border border-red-200 rounded'>
-				<h2 className='text-red-800 font-bold'>Erro no MFE de Login</h2>
-				<pre className='text-sm text-red-600'>{err.message}</pre>
-			</div>
-		);
-	},
-	domElementGetter: (props) => props.domElement || document.getElementById('mfe-login-container')!,
-});
+export function useAuth() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
-export const { bootstrap, mount, unmount } = lifecycles;
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await loginUser(credentials);
+
+      // 1. Atualizar Redux store (compartilhado com shell)
+      dispatch(authSlice.authSuccess(response));
+
+      // 2. Disparar evento customizado (outros MFEs podem escutar)
+      dispatchAuthSuccess(response);
+
+      // 3. Redirecionar para home após login
+      setTimeout(() => {
+        window.history.pushState({}, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }, 500); // Delay para feedback visual
+    } catch (err: any) {
+      const errorMessage =
+        err.message || "Erro ao fazer login. Verifique suas credenciais.";
+      setError(errorMessage);
+      dispatch(authSlice.setError(errorMessage));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (data: RegisterData) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await registerUser(data);
+
+      // 1. Atualizar Redux store (compartilhado com shell)
+      dispatch(authSlice.authSuccess(response));
+
+      // 2. Disparar evento customizado (outros MFEs podem escutar)
+      dispatchAuthSuccess(response);
+
+      // 3. Redirecionar para home após registro
+      setTimeout(() => {
+        window.history.pushState({}, "", "/");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }, 500);
+    } catch (err: any) {
+      const errorMessage =
+        err.message || "Erro ao criar conta. Tente novamente.";
+      setError(errorMessage);
+      dispatch(authSlice.setError(errorMessage));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { login, register, isLoading, error };
+}
