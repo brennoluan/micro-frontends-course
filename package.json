@@ -11,7 +11,7 @@
     "dev": "turbo run dev --parallel",
     "dev:simple": "turbo run dev --filter=api-backend --filter=web-simple --parallel",
     "dev:aula1": "turbo run dev --filter=api-backend --parallel",
-    "dev:aula2": "turbo run dev --filter=shell-singlespa --filter=mfe-login-singlespa --parallel",
+    "dev:aula2": "turbo run dev --filter=web-simple --filter=mfe-login-singlespa --filter=api-backend  --parallel",
     "dev:aula3": "turbo run dev --filter=shell-mf --filter=mfe-login-mf --parallel",
     "dev:aula4": "turbo run dev --filter=shell-native --filter=mfe-login-native --parallel",
     "build": "turbo run build",
