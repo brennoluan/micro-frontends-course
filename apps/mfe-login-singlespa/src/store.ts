@@ -1,4 +1,3 @@
-import { createSharedStore } from "@repo/store";
 import {
   useDispatch,
   useSelector,
@@ -6,11 +5,12 @@ import {
 } from "react-redux";
 import type { RootState, AppDispatch } from "@repo/store";
 
-// Create store instance
-export const store = createSharedStore();
+export function getSharedStore() {
+  if (!window.__SHARED_STORE__) {
+    throw new Error("Shared store not found on window.__SHARED_STORE__");
+  }
+  return window.__SHARED_STORE__;
+}
 
-(window as any).__SHARED_STORE__ = store;
-
-// Typed hooks
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
